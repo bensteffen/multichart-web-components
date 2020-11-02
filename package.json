@@ -1,0 +1,19 @@
+{
+  "name": "multichart-web-components",
+  "version": "1.0.0",
+  "description": "",
+  "main": "abstract.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Florian Haeussinger",
+  "license": "ISC",
+  "dependencies": {
+    "d3": "^6.2.0",
+    "eseval": "bensteffen/eseval"
+  },
+  "devDependencies": {
+    "webpack": "^5.3.2",
+    "webpack-cli": "^4.1.0"
+  }
+}
