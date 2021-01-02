@@ -58,13 +58,21 @@ export default class MultiChartScale extends MultiChartAbstract {
 
     getMargin() {
         const margin = this.margin
-        margin.left   = parseFloat(this.marginLeft)   || margin.left 
-        margin.right  = parseFloat(this.marginRight)  || margin.right 
-        margin.top    = parseFloat(this.marginTop)    || margin.top 
-        margin.bottom = parseFloat(this.marginBottom) || margin.bottom 
+        margin.left   = this.toMargin(this.marginLeft  , margin.left)
+        margin.right  = this.toMargin(this.marginRight , margin.right)
+        margin.top    = this.toMargin(this.marginTop   , margin.top)
+        margin.bottom = this.toMargin(this.marginBottom, margin.bottom)
         return margin
     }
     
+    toMargin(value, fallbackValue) {
+        const parsed = parseFloat(value)
+        if (isNaN(parsed)) {
+            return fallbackValue
+        }
+        return parsed
+    }
+
     updateSize() {
         const margin = this.getMargin()
         this.size = {
