@@ -6,9 +6,11 @@ export default class MultiChartLinearScale extends MultiChartScale {
         super()
     }
 
-    updateDomains() {
-        this.xDomain = scaleLinear().domain(this.xExtent)
-        this.yDomain = scaleLinear().domain(this.yExtent)
+    getDomains(extents) {
+        return {
+            x: scaleLinear().domain(extents.x),
+            y: scaleLinear().domain(extents.y)
+        }
     }
 }
 

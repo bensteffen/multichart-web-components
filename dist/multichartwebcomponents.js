@@ -7970,20 +7970,27 @@ class MultiChartScale extends MultiChartAbstract {
         return this.yDomain(value);
     }
 
-    getMargin() {
+    getCurrentMargins() {
         const margin = this.margin
-        margin.left   = parseFloat(this.marginLeft)   || margin.left 
-        margin.right  = parseFloat(this.marginRight)  || margin.right 
-        margin.top    = parseFloat(this.marginTop)    || margin.top 
-        margin.bottom = parseFloat(this.marginBottom) || margin.bottom 
+        margin.left   = this.toMargin(this.marginLeft  , margin.left)
+        margin.right  = this.toMargin(this.marginRight , margin.right)
+        margin.top    = this.toMargin(this.marginTop   , margin.top)
+        margin.bottom = this.toMargin(this.marginBottom, margin.bottom)
         return margin
     }
     
-    updateSize() {
-        const margin = this.getMargin()
-        this.size = {
-            width:  this.chart.size.width  - margin.left - margin.right,
-            height: this.chart.size.height - margin.top  - margin.bottom
+    toMargin(value, fallbackValue) {
+        const parsed = parseFloat(value)
+        if (isNaN(parsed)) {
+            return fallbackValue
+        }
+        return parsed
+    }
+
+    getCurrentSize(margins) {
+        return {
+            width:  this.chart.size.width  - margins.left - margins.right,
+            height: this.chart.size.height - margins.top  - margins.bottom
         }
     }
 
@@ -7992,22 +7999,27 @@ class MultiChartScale extends MultiChartAbstract {
     }
 
     update() {
-        this.updateSize()
-        const margin = this.getMargin()
-        this.container.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+        const margins = this.getCurrentMargins()
+        this.size = this.getCurrentSize(margins)
+
+        this.container.attr('transform', 'translate(' + margins.left + ',' + margins.top + ')');
 
         if (!this.views.length) return
 
-        this.updateExtents()
-        this.updateDomains()
+        const extents = this.getCurrentExtents()
+        this.xExtent = extents.x
+        this.yExtent = extents.y
 
+        const domains = this.getDomains(extents)
+        this.xDomain = domains.x
         this.xDomain.range([0, this.size.width])
+        this.yDomain = domains.y
         this.yDomain.range([this.size.height, 0])
 
         this.views.forEach(view => view.update())
     }
 
-    updateExtents() {
+    getCurrentExtents() {
         let xExtent = this.xLimits;
         let yExtent = this.yLimits;
         if (xExtent === 'auto' || yExtent === 'auto') {
@@ -8047,8 +8059,10 @@ class MultiChartScale extends MultiChartAbstract {
             yExtent.reverse();
         }
     
-        this.xExtent = xExtent;
-        this.yExtent = yExtent;
+        return {
+            x: xExtent,
+            y: yExtent
+        }
     }
 
     connectedCallback() {
@@ -9534,9 +9548,11 @@ class MultiChartLinearScale extends MultiChartScale {
         super()
     }
 
-    updateDomains() {
-        this.xDomain = linear_linear().domain(this.xExtent)
-        this.yDomain = linear_linear().domain(this.yExtent)
+    getDomains(extents) {
+        return {
+            x: linear_linear().domain(extents.x),
+            y: linear_linear().domain(extents.y)
+        }
     }
 }
 
