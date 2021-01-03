@@ -49,4 +49,16 @@ export default class MultiChartAbstract extends HTMLElement {
             })
         })
     }
+
+    getJSONAttributeValue(attributeName) {
+        if (!this.hasAttribute(attributeName)) {
+            return undefined
+        }
+        let value = this.getAttribute(attributeName)
+        try {
+            return JSON.parse(value)
+        } catch {
+            return value
+        }
+    }
 }
