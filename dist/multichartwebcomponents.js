@@ -6791,6 +6791,18 @@ class MultiChartAbstract extends HTMLElement {
             })
         })
     }
+
+    getJSONAttributeValue(attributeName) {
+        if (!this.hasAttribute(attributeName)) {
+            return undefined
+        }
+        let value = this.getAttribute(attributeName)
+        try {
+            return JSON.parse(value)
+        } catch {
+            return value
+        }
+    }
 }
 
 // CONCATENATED MODULE: ./node_modules/d3-selection/src/selector.js
@@ -7932,13 +7944,17 @@ class MultiChartScale extends MultiChartAbstract {
         this.chart = null
         this.views = []
 
-        this.observedAttributes = ['marginLeft', 'marginRight', 'marginTop', 'marginBottom']
+        this.observedAttributes = [
+            'marginLeft', 'marginRight', 'marginTop', 'marginBottom',
+            'xLimits', 'yLimits'
+        ]
         this.mapAttributesToProperties(this.observedAttributes)
         this.onAttributeChange(name => {
             if (name === 'class' && this.container) {
                 this.container.classed(this.getAttribute('class'), true)
             }
             if (this.observedAttributes.map(x => x.toLocaleLowerCase()).includes(name)) {
+                console.log(`scale attr "${name}" changed to ${this.getAttribute(name)}`)
                 this.update()
             }
         })
@@ -8020,8 +8036,8 @@ class MultiChartScale extends MultiChartAbstract {
     }
 
     getCurrentExtents() {
-        let xExtent = this.xLimits;
-        let yExtent = this.yLimits;
+        let xExtent = this.getJSONAttributeValue('xLimits') || 'auto'
+        let yExtent = this.getJSONAttributeValue('yLimits') || 'auto'
         if (xExtent === 'auto' || yExtent === 'auto') {
             let extents = this.views.map(view => view.getExtent())
             if (xExtent === 'auto') {
